@@ -1,5 +1,7 @@
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.Period;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 
@@ -80,18 +82,59 @@ public class Principal {
 
                 //Agrupar os funcionários por função em um MAP, sendo a chave a “função” e o valor a “lista de funcionários”
                 case 5:
-                    for(Funcionario f : listaFuncionarios) {
-                        
+                    for(Funcionario lista : listaFuncionarios) {
+                        //VERIFICA SE EXISTE UMA CHAVE COM O NOME DA FUNÇÃO, SE SIM, ADICIONA O FUNCIONÁRIO NA LISTA, SE NÃO, CRIA SE UM CHAVE NOVA
+                        funcionarioPorFuncao.computeIfAbsent(lista.getFuncao(), k -> new ArrayList<>()).add(lista);
                     }
-                    System.out.println("Map Criado com  sucesso!");
+                    System.out.println("Map criado com sucesso!");
                     break;
 
                 //Imprimir os funcionários, agrupados por função.
                 case 6:
-                    funcionarioPorFuncao.forEach((funcao, listaFuncionarios))
-            }
-        }
-    while (opcaoEscolhida != 0);
-    listaOpcoes.close();
-    }
-}
+                    //PERCORRE CADA ITEM DO MAP ENTREGANDO A CHAVE E O VALOR
+                    funcionarioPorFuncao.forEach((funcao, lista) -> {
+                        // IMPRESSÃO DOS FUNCIONÁRIOS CATEGORIZADOS POR FUNÇÃO
+                        System.out.println("\n" + funcao);
+                        lista.forEach(f -> System.out.println("> " + f.getNome()));
+                    });
+                    break;
+
+                //Imprimir os funcionários que fazem aniversário no mês 10 e 12.
+                case 7:
+                for(Funcionario f : listaFuncionarios) {
+                    //SALVA O NÚMERO DO MES DE 1 A 12
+                    int mes = f.getDataNascimento().getMonthValue();
+                    //COMPARA SE O MÊS E IGUAL AO PRETENDIDO E IMPRIME O FUNCIONÁRIO COM USA RESPECTIVA DATA DE NASCIMENTO
+                    if (mes == 10 || mes == 12){
+                        System.out.println(f.getNome()+" " + "nasceu em: " + f.getdataNascimentoFormatada());
+                    }
+                }
+                break;
+
+                //Imprimir o funcionário com a maior idade, exibir os atributos: nome e idade.
+                case 8:
+                    //CONSIDERANDO O PRIMEIRO DA LISTA COMO PONTO DE PARTIDA PARA A COMPARAÇÃO DE IDADE
+                    Funcionario maisVelho = listaFuncionarios.stream()
+                            .min(Comparator.comparing(Funcionario::getDataNascimento))
+                            .orElseThrow();
+
+                    // 2. CALCULA A IDADE E IMPRIME (Seu trecho de código mantido)
+                    int idade = Period.between(maisVelho.getDataNascimento(), LocalDate.now()).getYears();
+                    System.out.println("O funcionário mais velho é " + maisVelho.getNome() + " com " + idade + " anos.");
+                break;
+
+                //Imprimir a lista de funcionários por ordem alfabética.
+                case 9:
+                    listaFuncionarios.sort(Comparator.comparing(Funcionario::getNome));
+                    List<String>ordenados = new ArrayList<>();
+                    listaFuncionarios.forEach(f -> ordenados.add(f.getNome()));
+                    System.out.println(String.join(", ", ordenados));
+                    break;
+
+            } // 1. FECHA O BLOCO DO 'switch'
+        } // 2. FECHA O BLOCO DO 'do'
+        while (opcaoEscolhida != 0);
+
+        listaOpcoes.close();
+    } // FECHA O 'main'
+} // FECHA A 'class'
